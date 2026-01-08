@@ -38,12 +38,20 @@ const CreateBubbleModal: React.FC<Props> = ({ onClose, onCreate }) => {
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-[120] pointer-events-none">
-      <div 
-        ref={containerRef}
-        // Positioning: bottom of sidebar (approx where the button is)
-        className="absolute bottom-[88px] right-[16px] w-[288px] bg-slate-900 border border-slate-800 rounded-[28px] overflow-hidden shadow-[0_32px_80px_-16px_rgba(0,0,0,1)] animate-in slide-in-from-bottom-6 fade-in duration-300 pointer-events-auto"
-      >
+    <>
+      {/* Mobile backdrop */}
+      <div className="md:hidden fixed inset-0 z-[119] bg-black/50 backdrop-blur-sm pointer-events-auto" onClick={onClose} />
+
+      <div className="fixed inset-0 z-[120] pointer-events-none flex items-center justify-center md:block">
+        <div
+          ref={containerRef}
+          className="
+            bg-slate-900 border border-slate-800 rounded-[24px] md:rounded-[28px] overflow-hidden
+            shadow-[0_32px_80px_-16px_rgba(0,0,0,1)] animate-in slide-in-from-bottom-6 fade-in duration-300 pointer-events-auto
+            w-[90%] max-w-[320px] mx-4
+            md:absolute md:bottom-[88px] md:right-[16px] md:w-[288px] md:mx-0
+          "
+        >
         <div className="flex items-center justify-between p-4 border-b border-white/5 bg-slate-900/50">
           <h2 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">New Bubble</h2>
           <button 
@@ -129,6 +137,7 @@ const CreateBubbleModal: React.FC<Props> = ({ onClose, onCreate }) => {
         </form>
       </div>
     </div>
+    </>
   );
 };
 

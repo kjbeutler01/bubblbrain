@@ -16,7 +16,9 @@ interface Props {
 }
 
 const EXPANDED_WIDTH = 320;
+const EXPANDED_WIDTH_MOBILE = 280;
 const MIN_EXPANDED_HEIGHT = 440;
+const MIN_EXPANDED_HEIGHT_MOBILE = 380;
 
 // Custom easing for a smoother, premium feel
 const SMOOTH_EASING = 'cubic-bezier(0.19, 1, 0.22, 1)';
@@ -46,12 +48,16 @@ const BubbleCanvas: React.FC<Props> = ({
   useEffect(() => { sortModeRef.current = sortMode; }, [sortMode]);
 
   const getExpandedDimensions = (bubble: Bubble) => {
+    const isMobile = window.innerWidth < 768;
     const textLen = bubble.text.length;
     const descLen = (bubble.description || '').length;
     const titleRows = Math.ceil(textLen / 20);
     const descRows = Math.max(3, Math.ceil(descLen / 35));
     const height = 180 + (titleRows * 26) + (descRows * 20);
-    return { width: EXPANDED_WIDTH, height: Math.max(MIN_EXPANDED_HEIGHT, Math.min(height, 620)) };
+    const width = isMobile ? EXPANDED_WIDTH_MOBILE : EXPANDED_WIDTH;
+    const minHeight = isMobile ? MIN_EXPANDED_HEIGHT_MOBILE : MIN_EXPANDED_HEIGHT;
+    const maxHeight = isMobile ? 520 : 620;
+    return { width, height: Math.max(minHeight, Math.min(height, maxHeight)) };
   };
 
   // 1. Initial Simulation Setup
@@ -288,54 +294,54 @@ const BubbleCanvas: React.FC<Props> = ({
             <div className={`flex flex-col items-center justify-center text-center w-full h-full relative overflow-hidden box-border transition-opacity duration-150 ${isAnimating ? 'opacity-0' : 'opacity-100'}`}>
               
               {/* --- DIALOGUE / EXPANDED VIEW --- */}
-              <div className={`flex flex-col gap-4 w-full h-full p-6 pointer-events-auto overflow-hidden justify-between transition-all absolute inset-0 ${isExpanded ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}
+              <div className={`flex flex-col gap-3 md:gap-4 w-full h-full p-4 md:p-6 pointer-events-auto overflow-hidden justify-between transition-all absolute inset-0 ${isExpanded ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}
                    onMouseDown={(e) => e.stopPropagation()}
                    style={{ transitionTimingFunction: SMOOTH_EASING, transitionDuration: '200ms' }}>
                 <div className="flex flex-col gap-2 text-left flex-grow">
                   <div className="flex justify-between items-start">
-                    <input className={`bg-transparent text-xl font-bold w-full focus:outline-none py-0.5 border-b border-white/0 focus:border-white/20 transition-colors ${palette.text}`}
+                    <input className={`bg-transparent text-lg md:text-xl font-bold w-full focus:outline-none py-0.5 border-b border-white/0 focus:border-white/20 transition-colors ${palette.text}`}
                       value={bubble.text} onChange={(e) => onUpdateBubble(bubble.id, { text: e.target.value })} placeholder="Title..." />
                     <button onClick={(e) => { e.stopPropagation(); handleToggleExpand(bubble.id); }}
                       className="text-slate-500 hover:text-white transition-colors ml-2 p-1 rounded-full hover:bg-slate-800"
                     >
-                      <X size={20} />
+                      <X size={18} className="md:w-5 md:h-5" />
                     </button>
                   </div>
-                  <textarea className={`bg-slate-950/50 border border-slate-800/80 rounded-[20px] p-4 text-sm leading-snug text-slate-100 w-full focus:outline-none focus:ring-1 focus:ring-indigo-500/30 resize-none transition-all mt-1 flex-grow shadow-inner font-inter`}
+                  <textarea className={`bg-slate-950/50 border border-slate-800/80 rounded-[16px] md:rounded-[20px] p-3 md:p-4 text-xs md:text-sm leading-snug text-slate-100 w-full focus:outline-none focus:ring-1 focus:ring-indigo-500/30 resize-none transition-all mt-1 flex-grow shadow-inner font-inter`}
                     placeholder="Describe your thoughts..." value={bubble.description || ''}
                     onChange={(e) => onUpdateBubble(bubble.id, { description: e.target.value })}
                   />
                 </div>
-                <div className="flex flex-col gap-3 mt-auto">
-                  <div className="space-y-4">
+                <div className="flex flex-col gap-2 md:gap-3 mt-auto">
+                  <div className="space-y-3 md:space-y-4">
                     <div className="flex flex-col gap-1.5">
-                      <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 px-1">Sphere Impact</span>
-                      <div className="flex justify-between items-center gap-2">
+                      <span className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-slate-500 px-1">Sphere Impact</span>
+                      <div className="flex justify-between items-center gap-1.5 md:gap-2">
                         {[1, 2, 3, 4, 5].map(s => (
                           <button key={s} onClick={() => onUpdateBubble(bubble.id, { size: s })}
-                                  className={`flex-1 h-10 rounded-xl border transition-all flex items-center justify-center ${bubble.size === s ? 'bg-indigo-600 border-indigo-400 text-white scale-105 shadow-xl shadow-indigo-500/50' : 'bg-slate-900 border-slate-800 text-slate-600 hover:text-slate-300'}`}>
+                                  className={`flex-1 h-8 md:h-10 rounded-lg md:rounded-xl border transition-all flex items-center justify-center ${bubble.size === s ? 'bg-indigo-600 border-indigo-400 text-white scale-105 shadow-xl shadow-indigo-500/50' : 'bg-slate-900 border-slate-800 text-slate-600 hover:text-slate-300'}`}>
                             <div className="rounded-full bg-current" style={{ width: 4 + s * 1.5, height: 4 + s * 1.5 }} />
                           </button>
                         ))}
                       </div>
                     </div>
                     <div className="flex flex-col gap-1.5">
-                      <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 px-1">Sphere Aura</span>
-                      <div className="flex justify-between items-center gap-2">
+                      <span className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-slate-500 px-1">Sphere Aura</span>
+                      <div className="flex justify-between items-center gap-1.5 md:gap-2">
                         {BUBBLE_COLORS.map(c => (
                           <button key={c} onClick={() => onUpdateBubble(bubble.id, { color: c })}
-                                  className={`flex-1 h-10 rounded-xl border transition-all flex items-center justify-center ${bubble.color === c ? 'ring-2 ring-white border-transparent scale-105 shadow-xl' : 'border-white/5 opacity-40 hover:opacity-100'} ${COLOR_PALETTE[c].bg.replace('/10', '/50')}`}>
-                            <div className={`w-4 h-4 rounded-full ${COLOR_PALETTE[c].bg.replace('/10', '')}`} />
+                                  className={`flex-1 h-8 md:h-10 rounded-lg md:rounded-xl border transition-all flex items-center justify-center ${bubble.color === c ? 'ring-2 ring-white border-transparent scale-105 shadow-xl' : 'border-white/5 opacity-40 hover:opacity-100'} ${COLOR_PALETTE[c].bg.replace('/10', '/50')}`}>
+                            <div className={`w-3 h-3 md:w-4 md:h-4 rounded-full ${COLOR_PALETTE[c].bg.replace('/10', '')}`} />
                           </button>
                         ))}
                       </div>
                     </div>
                   </div>
-                  <div className="flex flex-col gap-2 border-t border-white/10 pt-4">
+                  <div className="flex flex-col gap-2 border-t border-white/10 pt-3 md:pt-4">
                     <button onClick={() => onDeleteBubble(bubble.id)}
-                            className="w-fit px-4 py-2.5 text-rose-500 hover:text-rose-400 transition-all hover:bg-rose-500/10 rounded-xl flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] border border-rose-500/20"
+                            className="w-fit px-3 md:px-4 py-2 md:py-2.5 text-rose-500 hover:text-rose-400 transition-all hover:bg-rose-500/10 rounded-lg md:rounded-xl flex items-center gap-1.5 md:gap-2 text-[8px] md:text-[9px] font-black uppercase tracking-[0.2em] border border-rose-500/20"
                     >
-                      <Trash2 size={14} /> Delete Bubble
+                      <Trash2 size={12} className="md:w-[14px] md:h-[14px]" /> Delete Bubble
                     </button>
                   </div>
                 </div>
