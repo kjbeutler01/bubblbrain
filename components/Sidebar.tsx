@@ -19,6 +19,8 @@ interface Props {
   onToggleGallery: () => void;
   onOpenCreateModal: () => void;
   activePressure: number;
+  isMobileOpen: boolean;
+  onMobileClose: () => void;
 }
 
 const Sidebar: React.FC<Props> = ({
@@ -34,45 +36,69 @@ const Sidebar: React.FC<Props> = ({
   isGalleryOpen,
   onToggleGallery,
   onOpenCreateModal,
-  activePressure
+  activePressure,
+  isMobileOpen,
+  onMobileClose
 }) => {
   return (
-    <aside className="w-80 bg-slate-950 flex flex-col py-6 px-4 z-[110] overflow-hidden border-l border-slate-900 shadow-2xl">
-      <button 
+    <>
+      {/* Mobile backdrop */}
+      {isMobileOpen && (
+        <div
+          className="md:hidden fixed inset-0 bg-black/50 z-[100] backdrop-blur-sm"
+          onClick={onMobileClose}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside className={`
+        bg-slate-950 flex flex-col py-4 md:py-6 px-4 z-[110] overflow-hidden border-slate-900 shadow-2xl
+        md:w-80 md:border-l md:relative
+        fixed bottom-0 left-0 right-0 rounded-t-[32px] border-t
+        transition-transform duration-300 ease-in-out
+        ${isMobileOpen ? 'translate-y-0' : 'translate-y-full md:translate-y-0'}
+        max-h-[75vh] md:max-h-none
+      `}>
+        {/* Mobile drag handle */}
+        <div className="md:hidden flex justify-center mb-3">
+          <div className="w-12 h-1 bg-slate-700 rounded-full" />
+        </div>
+
+        <button
         onClick={onToggleGallery}
-        className={`w-full py-4 mb-4 rounded-2xl flex items-center justify-center gap-3 transition-all border font-black text-xs tracking-widest uppercase
-          ${isGalleryOpen 
-            ? 'bg-indigo-600 text-white border-indigo-400 shadow-lg shadow-indigo-500/40' 
+        className={`w-full py-3 md:py-4 mb-3 md:mb-4 rounded-2xl flex items-center justify-center gap-2 md:gap-3 transition-all border font-black text-[10px] md:text-xs tracking-widest uppercase
+          ${isGalleryOpen
+            ? 'bg-indigo-600 text-white border-indigo-400 shadow-lg shadow-indigo-500/40'
             : 'bg-slate-900 text-indigo-400 border-slate-800 hover:bg-slate-800 hover:text-white'}
         `}
       >
-        {isGalleryOpen ? <CornerUpLeft size={18} /> : <LayoutGrid size={18} />}
+        {isGalleryOpen ? <CornerUpLeft size={16} className="md:w-[18px] md:h-[18px]" /> : <LayoutGrid size={16} className="md:w-[18px] md:h-[18px]" />}
         {isGalleryOpen ? 'Return' : 'Gallery View'}
       </button>
 
       <div className={`flex-1 flex flex-col transition-all duration-500 ${isGalleryOpen ? 'opacity-20 pointer-events-none grayscale blur-[1px]' : 'opacity-100'}`}>
-        <div className="flex gap-2 mb-4">
-          <button 
+        <div className="flex gap-2 mb-3 md:mb-4">
+          <button
             onClick={onSortByColor}
             title="Sort by Color"
-            className={`h-12 flex-1 flex items-center justify-center rounded-xl transition-all border
-              ${sortMode === 'color' 
-                ? 'bg-indigo-500 text-white border-indigo-400 shadow-lg shadow-indigo-500/20' 
+            className={`h-10 md:h-12 flex-1 flex items-center justify-center rounded-xl transition-all border
+              ${sortMode === 'color'
+                ? 'bg-indigo-500 text-white border-indigo-400 shadow-lg shadow-indigo-500/20'
                 : 'bg-slate-900 text-slate-300 border-slate-800 hover:bg-slate-800 hover:text-white'}
             `}
           >
-            <Palette size={18} />
+            <Palette size={16} className="md:w-[18px] md:h-[18px]" />
           </button>
-          <button 
+          <button
             onClick={onSortByPriority}
             title="Sort by Priority"
-            className={`h-12 flex-1 flex items-center justify-center rounded-xl transition-all border
-              ${sortMode === 'priority' 
-                ? 'bg-purple-500 text-white border-purple-400 shadow-lg shadow-purple-500/20' 
+            className={`h-10 md:h-12 flex-1 flex items-center justify-center rounded-xl transition-all border
+              ${sortMode === 'priority'
+                ? 'bg-purple-500 text-white border-purple-400 shadow-lg shadow-purple-500/20'
                 : 'bg-slate-900 text-slate-300 border-slate-800 hover:bg-slate-800 hover:text-white'}
             `}
           >
-            <AlignLeft size={18} />
+            <AlignLeft size={16} className="md:w-[18px] md:h-[18px]" />
           </button>
         </div>
 
@@ -126,11 +152,11 @@ const Sidebar: React.FC<Props> = ({
           })}
         </div>
 
-        <div className="pt-6">
-          <button 
+        <div className="pt-4 md:pt-6">
+          <button
             onClick={onOpenCreateModal}
             disabled={activePressure >= 100}
-            className={`w-full py-4 rounded-[20px] flex items-center justify-center gap-2 text-white shadow-xl transition-all duration-300 border border-white/10 font-bold tracking-widest uppercase text-xs
+            className={`w-full py-3 md:py-4 rounded-[20px] flex items-center justify-center gap-2 text-white shadow-xl transition-all duration-300 border border-white/10 font-bold tracking-widest uppercase text-[10px] md:text-xs
               ${activePressure >= 100 ? 'bg-slate-800 cursor-not-allowed opacity-50' : 'bg-gradient-to-tr from-indigo-600 to-purple-500 hover:scale-[1.02] active:scale-[0.98]'}
             `}
           >
@@ -139,6 +165,7 @@ const Sidebar: React.FC<Props> = ({
         </div>
       </div>
     </aside>
+    </>
   );
 };
 

@@ -42,6 +42,7 @@ const App: React.FC = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [focusedColor, setFocusedColor] = useState<BubbleColor | null>(null);
   const [sortMode, setSortMode] = useState<SortMode>('none');
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [colorLabels, setColorLabels] = useState<Record<string, Record<BubbleColor, string>>>({
     'ws-1': { blue: 'Daily', green: 'Relax', yellow: 'Idea', purple: 'Vision', red: 'Urgent' },
     'ws-2': { blue: 'Email', green: 'Meetings', yellow: 'Research', purple: 'Code', red: 'Deadline' },
@@ -173,17 +174,18 @@ const App: React.FC = () => {
 
   return (
     <div className="relative h-screen w-screen bg-slate-950 overflow-hidden flex flex-col font-inter">
-      <Header 
-        workspaces={workspaces} 
-        activeWorkspaceId={activeWorkspaceId} 
+      <Header
+        workspaces={workspaces}
+        activeWorkspaceId={activeWorkspaceId}
         setActiveWorkspaceId={setActiveWorkspaceId}
         onWorkspaceNameChange={handleWorkspaceNameChange}
         pressure={activePressure}
+        onToggleMobileSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
       />
 
-      <div className={`flex-1 flex overflow-hidden p-3 gap-3`}>
-        <main className={`relative flex-1 bg-slate-900 overflow-hidden shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)] transition-all duration-700 rounded-[32px] border border-slate-800`}>
-          <BubbleCanvas 
+      <div className="flex-1 flex overflow-hidden p-2 md:p-3 gap-0 md:gap-3">
+        <main className="relative flex-1 bg-slate-900 overflow-hidden shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)] transition-all duration-700 rounded-[20px] md:rounded-[32px] border border-slate-800">
+          <BubbleCanvas
             bubbles={activeWorkspace.bubbles}
             onUpdate={updateBubbles}
             onTogglePersistent={togglePersistent}
@@ -192,11 +194,11 @@ const App: React.FC = () => {
             onDeleteBubble={deleteBubble}
             sortMode={sortMode}
           />
-          
+
           {isGalleryOpen && (
-            <GalleryView 
-              workspaces={workspaces.map(ws => ({ ...ws, pressure: calculatePressure(ws.bubbles) }))} 
-              onClose={() => setIsGalleryOpen(false)} 
+            <GalleryView
+              workspaces={workspaces.map(ws => ({ ...ws, pressure: calculatePressure(ws.bubbles) }))}
+              onClose={() => setIsGalleryOpen(false)}
               onSelect={(id) => {
                 setActiveWorkspaceId(id);
                 setIsGalleryOpen(false);
@@ -205,7 +207,7 @@ const App: React.FC = () => {
           )}
         </main>
 
-        <Sidebar 
+        <Sidebar
           bubbles={activeWorkspace.bubbles}
           onAddBubble={(color, size, isRitual) => addBubble(color, size, 'New Task', isRitual)}
           onSortByColor={toggleSortByColor}
@@ -220,11 +222,13 @@ const App: React.FC = () => {
           onToggleGallery={() => setIsGalleryOpen(!isGalleryOpen)}
           onOpenCreateModal={() => setIsCreateModalOpen(true)}
           activePressure={activePressure}
+          isMobileOpen={isMobileSidebarOpen}
+          onMobileClose={() => setIsMobileSidebarOpen(false)}
         />
       </div>
 
       {isCreateModalOpen && !isGalleryOpen && (
-        <CreateBubbleModal 
+        <CreateBubbleModal
           onClose={() => setIsCreateModalOpen(false)}
           onCreate={addBubble}
         />
